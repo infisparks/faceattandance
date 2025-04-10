@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Prescription Generator</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body class="bg-gray-100">
+    <div class="min-h-screen flex items-center justify-center">
+      <div class="bg-white p-8 rounded shadow-md w-full max-w-md">
+        <h1 class="text-2xl font-bold mb-6 text-center">Prescription Generator</h1>
+        <div class="mb-4">
+          <label for="prompt" class="block text-gray-700 mb-2">Enter your prompt:</label>
+          <input
+            type="text"
+            id="prompt"
+            class="w-full p-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500"
+            placeholder="Type your prompt or use voice input"
+          />
+        </div>
+        <div class="flex justify-between mb-4">
+          <button
+            id="voiceBtn"
+            class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 focus:outline-none"
+          >
+            Record Voice
+          </button>
+          <button
+            id="submitBtn"
+            class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 focus:outline-none"
+          >
+            Submit
+          </button>
+        </div>
+        <div id="response" class="mt-4 p-4 border border-gray-300 rounded"></div>
+      </div>
+    </div>
+
+    <script>
+      // Get DOM elements
+      const promptInput = document.getElementById('prompt');
+      const responseDiv = document.getElementById('response');
+      const voiceBtn = document.getElementById('voiceBtn');
+      const submitBtn = document.getElementById('submitBtn');
+
+      // Check for Speech Recognition support
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      let recognition;
+      if (SpeechRecognition) {
+        recognition = new SpeechRecognition();
+        recognition.lang = 'en-US';
+        recognition.continuous = false;
+        recognition.interimResults = false;
+
+        recognition.onresult = function(event) {
+          const transcript = event.results[0][0].transcript;
+          promptInput.value = transcript;
+        };
+
+        recognition.onerror = function(event) {
+          console.error('Speech recognition error:', event.error);
+        };
+      } else {
+        voiceBtn.disabled = true;
+        voiceBtn.innerText = "Voice not supported";
+      }
+
+      // Start voice recognition on button click
+      voiceBtn.addEventListener('click', function() {
+        if (recognition) {
+          recognition.start();
+        }
+      });
+
+      // Submit prompt to the API
+      submitBtn.addEventListener('click', function() {
+        const promptText = promptInput.value.trim();
+        if (!promptText) {
+          responseDiv.innerHTML = "<p class='text-red-500'>Please enter a prompt.</p>";
+          return;
+        }
+        responseDiv.innerHTML = "<p>Loading...</p>";
+
+        // IMPORTANT: Use HTTPS to match the secure origin of your page.
+        fetch("https://doctor.medblisss.com/generatePrescription", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ text: promptText })
+        })
+          .then(function(response) {
+            if (!response.ok) {
+              throw new Error("Network response was not ok");
+            }
+            return response.json();
+          })
+          .then(function(data) {
+            responseDiv.innerHTML =
+              "<pre class='whitespace-pre-wrap'>" +
+              JSON.stringify(data, null, 2) +
+              "</pre>";
+          })
+          .catch(function(error) {
+            console.error('Error:', error);
+            responseDiv.innerHTML = "<p class='text-red-500'>An error occurred. Please try again.</p>";
+          });
+      });
+    </script>
+  </body>
+</html>

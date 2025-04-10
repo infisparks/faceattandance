@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Delete User</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100">
+  <div class="container mx-auto p-4">
+    <h1 class="text-3xl font-bold mb-6">Delete User</h1>
+    {% if users %}
+      <ul class="space-y-3">
+        {% for user in users %}
+          <li class="flex justify-between items-center p-3 bg-white rounded shadow">
+            <span class="font-bold">{{ user }}</span>
+            <form action="{{ url_for('delete', username=user) }}" method="post">
+              <button type="submit" class="bg-red-500 hover:bg-red-600 text-white font-bold py-1 px-3 rounded">
+                Delete
+              </button>
+            </form>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p class="bg-white p-4 rounded shadow">No users found.</p>
+    {% endif %}
+    <a href="{{ url_for('index') }}" class="mt-6 inline-block text-blue-500 hover:underline">Back to Home</a>
+  </div>
+</body>
+</html>

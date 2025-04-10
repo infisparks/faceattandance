@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Face Recognition</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100">
+  <div class="container mx-auto p-4">
+    <h1 class="text-3xl font-bold mb-6">Face Recognition</h1>
+    <div>
+      <img src="{{ url_for('recognition_feed') }}" class="w-full max-w-lg border rounded" alt="Recognition Feed">
+    </div>
+    <a href="{{ url_for('index') }}" class="mt-4 inline-block text-blue-500 hover:underline">Back to Home</a>
+  </div>
+</body>
+</html>
